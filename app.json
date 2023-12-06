@@ -21,16 +21,27 @@
 		],
 		"assetBundlePatterns": ["**/*"],
 		"ios": {
-			"supportsTablet": true
+			"supportsTablet": true,
+			"infoPlist": {
+				"NSCameraUsageDescription": "Allow juicy to access camera.",
+				"NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone"
+			}
 		},
 		"android": {
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/adaptive-icon.png",
 				"backgroundColor": "#ffffff"
-			}
+			},
+			"permissions": ["android.permission.CAMERA"],
+			"package": "com.ahmadlohani.juicy"
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
+		},
+		"extra": {
+			"eas": {
+				"projectId": "0bb60e18-fdea-4430-b3fc-a057ac2de5fc"
+			}
 		}
 	}
 }

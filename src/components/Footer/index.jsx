@@ -1,19 +1,10 @@
 import React from "react";
 import { View, TouchableOpacity } from "react-native";
-import {
-	useNavigation,
-	useRoute,
-} from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontAwesome5 } from "@expo/vector-icons";
 
-export const Tab = ({
-	name,
-	handlePress,
-	screenName,
-	routeName,
-}) => {
-	const activeScreenColor =
-		screenName === routeName ? "black" : "gray";
+export const Tab = ({ name, handlePress, screenName, routeName }) => {
+	const activeScreenColor = screenName === routeName ? "black" : "gray";
 
 	return (
 		<TouchableOpacity onPress={handlePress}>
@@ -58,21 +49,21 @@ export default function index() {
 					routeName={route.name}
 				/>
 				<Tab
-					name="search"
-					handlePress={() => navigation.navigate("Search")}
-					screenName="Search"
-					routeName={route.name}
-				/>
-				<Tab
 					name="list-alt"
 					handlePress={() => navigation.navigate("Booking")}
 					screenName="Booking"
 					routeName={route.name}
 				/>
 				<Tab
+					name="search"
+					handlePress={() => navigation.navigate("About")}
+					screenName="About"
+					routeName={route.name}
+				/>
+				<Tab
 					name="user"
-					handlePress={() => navigation.navigate("Account")}
-					screenName="Account"
+					handlePress={() => navigation.navigate("Privacy")}
+					screenName="Privacy"
 					routeName={route.name}
 				/>
 			</View>

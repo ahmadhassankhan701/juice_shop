@@ -1,128 +1,95 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Sizes } from "../../utils/theme";
 import Footer from "../../components/Footer";
-import { BarCodeScanner } from "expo-barcode-scanner";
 import { TouchableOpacity } from "react-native";
+import { AuthContext } from "../../context/AuthContext";
+import { doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import { db } from "../../../firebase";
+import { Image } from "react-native";
+import QRCode from "react-native-qrcode-svg";
 const Home = () => {
+	const { state } = useContext(AuthContext);
+	const [loading, setLoading] = useState(false);
+	const [pointsData, setPointsData] = useState(null);
 	const [scanned, setScanned] = useState(true);
-	const handleBarVisible = async () => {
-		const { status: existingStatus } =
-			await BarCodeScanner.getPermissionsAsync();
-		let finalStatus = existingStatus;
-		if (existingStatus !== "granted") {
-			const { status } = await BarCodeScanner.requestPermissionsAsync();
-			finalStatus = status;
-		}
-		if (finalStatus !== "granted") {
-			alert("Need camera roll permissions to make this work!");
-			return;
-		}
-		setScanned(false);
-	};
-	const handleBarCodeScanned = ({ type, data }) => {
-		console.log("Data", data);
-		console.log("Type", type);
-		setScanned(true);
-	};
+	useEffect(() => {
+		const getUserPoints = async () => {
+			try {
+				setLoading(true);
+				const pointsRef = doc(db, "Points", state.user.id);
+				onSnapshot(pointsRef, (docSnap) => {
+					if (docSnap.exists()) {
+						setLoading(false);
+						setPointsData(docSnap.data());
+					} else {
+						setLoading(false);
+						setPointsData(null);
+					}
+				});
+			} catch (error) {
+				setLoading(false);
+				console.log(error);
+			}
+		};
+		state && state.user && getUserPoints();
+	}, [state && state.user]);
+
 	return (
 		<View style={styles.container}>
-			{scanned ? (
-				<View style={{ display: "flex", alignItems: "center" }}>
-					<View style={styles.wrapper}>
-						<ScrollView showsVerticalScrollIndicator={false}>
+			{loading && (
+				<View
+					style={{
+						position: "absolute",
+						backgroundColor: "#000000",
+						opacity: 0.5,
+						zIndex: 999,
+						width: "100%",
+						height: "100%",
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "center",
+					}}
+				>
+					<Image
+						source={require("../../assets/loader.gif")}
+						style={{
+							alignSelf: "center",
+							width: 200,
+							height: 200,
+						}}
+					/>
+				</View>
+			)}
+			{/* <Text>{JSON.stringify(pointsData, null, 4)}</Text> */}
+			<View style={{ display: "flex", alignItems: "center" }}>
+				<View style={styles.wrapper}>
+					<ScrollView showsVerticalScrollIndicator={false}>
+						<View
+							style={{
+								display: "flex",
+								flexDirection: "row",
+								gap: 10,
+							}}
+						>
 							<View
 								style={{
-									display: "flex",
-									flexDirection: "row",
-									gap: 10,
-								}}
-							>
-								<View
-									style={{
-										backgroundColor: "#ffffff",
-										padding: 10,
-										height: 100,
-										borderRadius: 10,
-										flex: 1,
-									}}
-								>
-									<View
-										style={{
-											display: "flex",
-											alignItems: "center",
-											flexDirection: "row",
-											justifyContent: "space-between",
-										}}
-									>
-										<Text>Total Points</Text>
-									</View>
-									<View
-										style={{
-											display: "flex",
-											justifyContent: "center",
-											alignItems: "center",
-										}}
-									>
-										<Text
-											style={{
-												fontWeight: "700",
-												fontSize: 48,
-											}}
-										>
-											0
-										</Text>
-									</View>
-								</View>
-								<View
-									style={{
-										backgroundColor: "#ffffff",
-										padding: 10,
-										height: 100,
-										borderRadius: 10,
-										flex: 1,
-									}}
-								>
-									<View
-										style={{
-											display: "flex",
-											alignItems: "center",
-											flexDirection: "row",
-											justifyContent: "space-between",
-										}}
-									>
-										<Text>Points Used</Text>
-									</View>
-									<View
-										style={{
-											display: "flex",
-											justifyContent: "center",
-											alignItems: "center",
-										}}
-									>
-										<Text
-											style={{
-												fontWeight: "700",
-												fontSize: 48,
-											}}
-										>
-											0
-										</Text>
-									</View>
-								</View>
-							</View>
-							<View
-								style={{
-									marginTop: 10,
 									backgroundColor: "#ffffff",
-									paddingHorizontal: 10,
+									padding: 10,
 									height: 100,
 									borderRadius: 10,
-									width: "100%",
+									flex: 1,
 								}}
 							>
-								<View style={{ marginTop: 10 }}>
-									<Text>Remaining Points</Text>
+								<View
+									style={{
+										display: "flex",
+										alignItems: "center",
+										flexDirection: "row",
+										justifyContent: "space-between",
+									}}
+								>
+									<Text>Total Points</Text>
 								</View>
 								<View
 									style={{
@@ -137,59 +104,97 @@ const Home = () => {
 											fontSize: 48,
 										}}
 									>
-										0
+										{pointsData && pointsData.total ? pointsData.total : 0}
 									</Text>
 								</View>
 							</View>
-							<View>
+							<View
+								style={{
+									backgroundColor: "#ffffff",
+									padding: 10,
+									height: 100,
+									borderRadius: 10,
+									flex: 1,
+								}}
+							>
+								<View
+									style={{
+										display: "flex",
+										alignItems: "center",
+										flexDirection: "row",
+										justifyContent: "space-between",
+									}}
+								>
+									<Text>Points Used</Text>
+								</View>
 								<View
 									style={{
 										display: "flex",
 										justifyContent: "center",
 										alignItems: "center",
-										marginTop: 30,
 									}}
 								>
-									<TouchableOpacity
-										onPress={handleBarVisible}
+									<Text
 										style={{
-											display: "flex",
-											justifyContent: "center",
-											alignItems: "center",
-											borderWidth: 0,
-											borderColor: "transparent",
-											shadowColor: "#000",
-											shadowOffset: {
-												width: 0,
-												height: 2,
-											},
-											shadowOpacity: 0.25,
-											shadowRadius: 3.84,
-											elevation: 5,
-											borderRadius: 100,
-											padding: 50,
-											height: 200,
-											width: 200,
-											backgroundColor: "#ffffff",
+											fontWeight: "700",
+											fontSize: 48,
 										}}
 									>
-										<Text>Scan Code</Text>
-									</TouchableOpacity>
+										{pointsData && pointsData.used ? pointsData.used : 0}
+									</Text>
 								</View>
 							</View>
-						</ScrollView>
-					</View>
-					<View style={styles.footer}>
-						<Footer />
-					</View>
+						</View>
+						<View
+							style={{
+								marginTop: 10,
+								backgroundColor: "#ffffff",
+								paddingHorizontal: 10,
+								height: 100,
+								borderRadius: 10,
+								width: "100%",
+							}}
+						>
+							<View style={{ marginTop: 10 }}>
+								<Text>Remaining Points</Text>
+							</View>
+							<View
+								style={{
+									display: "flex",
+									justifyContent: "center",
+									alignItems: "center",
+								}}
+							>
+								<Text
+									style={{
+										fontWeight: "700",
+										fontSize: 48,
+									}}
+								>
+									{pointsData && pointsData.remaining
+										? pointsData.remaining
+										: 0}
+								</Text>
+							</View>
+						</View>
+						<View>
+							<View
+								style={{
+									display: "flex",
+									justifyContent: "center",
+									alignItems: "center",
+									marginTop: 30,
+								}}
+							>
+								<QRCode value="http://awesome.link.qr" />
+							</View>
+						</View>
+					</ScrollView>
 				</View>
-			) : (
-				<BarCodeScanner
-					onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-					style={StyleSheet.absoluteFillObject}
-					// barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
-				/>
-			)}
+				<View style={styles.footer}>
+					<Footer />
+				</View>
+			</View>
 		</View>
 	);
 };
@@ -201,7 +206,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: "center",
 		marginTop: 50,
-		marginBottom: 30,
+		marginBottom: 15,
 	},
 	wrapper: {
 		flex: 1,
