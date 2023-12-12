@@ -11,14 +11,6 @@
 			"resizeMode": "contain",
 			"backgroundColor": "#000000"
 		},
-		"plugins": [
-			[
-				"expo-barcode-scanner",
-				{
-					"cameraPermission": "Allow juicy to access camera."
-				}
-			]
-		],
 		"assetBundlePatterns": ["**/*"],
 		"ios": {
 			"supportsTablet": true,

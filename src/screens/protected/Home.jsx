@@ -7,7 +7,8 @@ import { AuthContext } from "../../context/AuthContext";
 import { doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { Image } from "react-native";
-import QRCode from "react-native-qrcode-svg";
+import Barcode from "@kichiyaki/react-native-barcode-generator";
+import { QrCodeSvg } from "react-native-qr-svg";
 const Home = () => {
 	const { state } = useContext(AuthContext);
 	const [loading, setLoading] = useState(false);
@@ -184,9 +185,33 @@ const Home = () => {
 									justifyContent: "center",
 									alignItems: "center",
 									marginTop: 30,
+									width: "100%",
 								}}
 							>
-								<QRCode value="http://awesome.link.qr" />
+								{pointsData && (
+									<View>
+										{/* <Barcode
+											value={`${state.user.id},${pointsData.total},${pointsData.used},${pointsData.remaining}`}
+											format="CODE128"
+											width={1.5}
+											height={80}
+											textStyle={{
+												fontSize: 12,
+												fontWeight: "700",
+											}}
+											textMargin={2}
+											backgroundColor="#ffffff"
+											lineColor="#000000"
+											lineWidth={1}
+										/> */}
+										<View style={{ alignItems: "center" }}>
+											<QrCodeSvg
+												value={`${state.user.id},${pointsData.total},${pointsData.used},${pointsData.remaining}`}
+												frameSize={200}
+											/>
+										</View>
+									</View>
+								)}
 							</View>
 						</View>
 					</ScrollView>
