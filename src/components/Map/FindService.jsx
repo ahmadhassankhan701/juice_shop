@@ -129,7 +129,7 @@ const FindService = ({ location, handleChange }) => {
 					}
 				}}
 				query={{
-					key: "AIzaSyCAukR_SsOKADb2N1YmOEyRwFGKWZTwmOo",
+					key: "",
 					language: "en",
 					types: "establishment",
 					radius: 8000,
