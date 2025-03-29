@@ -5,12 +5,12 @@ import { getStorage } from "firebase/storage";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
-	apiKey: "AIzaSyA67LRgYP6IkZBUf5Fymd5619qPwGjWs9c",
-	authDomain: "juiceshop-64800.firebaseapp.com",
-	projectId: "juiceshop-64800",
-	storageBucket: "juiceshop-64800.appspot.com",
-	messagingSenderId: "942710076991",
-	appId: "1:942710076991:web:11fbfa4570f3551c722a8a",
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: "",
 };
 
 export const app = initializeApp(firebaseConfig, "JuiceShop");
